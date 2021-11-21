@@ -1,0 +1,71 @@
+import re
+uFile = "UserInfo.txt"
+
+def home(option=None):
+	print("Welcome, please select an option")
+	option = input("Login | Register:")
+	if option == "Login":
+		login()
+	elif option == "Register":
+		register()
+	else:
+		print("Please enter a valid parameter, this is case-sensitive")
+
+def register():
+    print("Please Provide")
+    while True:
+      try:
+        userName = input("UserName: ")
+      except ValueError:
+        print("Sorry, I did not understand that.")
+        continue
+
+      username_regex = re.compile(r"[^@]+@[^@]+\.[^@]+")
+      if username_regex.match(userName):
+        break
+      else:
+        print("'Invalid UserName, it should contain @ followed by . but not immediately'")
+        continue
+
+    while True:
+      try:
+        password = input("Password: ")
+      except ValueError:
+        print("Sorry, I did not understand that.")
+        continue
+      
+      password_regex = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{5,16}$")
+      if password_regex.match(password):
+        break
+      else:
+        print("'Invalid password combinations or length, Must have minimum one special character, one uppercase, one lowercase, a numeric and length between 5 and 16: '")
+        continue
+  
+    f = open(uFile,'r')
+    info = f.read()
+    if userName in info:
+        return "Name Unavailable. Please Try Again"
+    f.close()
+    f = open(uFile,'w')
+    info = info + " " + userName + " " + password
+    f.write(info)
+
+def login():
+  print("Please Provide")
+  userName = input("Name: ")
+  password = input("Password: ")
+  f = open(uFile,'r')
+  info = f.read()
+  info = info.split()
+  if userName in info:
+    index = info.index(userName) + 1
+    info_password = info[index]
+    if info_password == password:
+      print("Welcome Back, " + userName.rsplit('@')[0])
+    else:
+      print("Password entered is wrong")
+  else:
+    print("UserName not found. Please Register.")
+    home()
+
+home()
