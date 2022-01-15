@@ -1,0 +1,51 @@
+#Classification model
+import pandas as pd
+import numpy as np
+import warnings
+import seaborn as sns
+import matplotlib.pyplot as plt
+% matplotlib inline
+from sklearn.linear_model import LogisticRegression
+
+warnings.filterwarnings('ignore')
+plt.rcParams['figure.figsize'] = (10, 10)
+plt.style.use('seaborn')
+
+diabetesDF = pd.read_csv('https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv',names=['pregnancies','glucose','bloodpressure','skinthickness','insulin','BMI','DiabetesPedigreeFunction','Age','Outcome'  ])
+print(diabetesDF.head())
+
+diabetesDF.info()
+
+diabetesDF['Outcome'].value_counts() # finidng the value counts
+#to find missing vaues
+diabetesDF.isnull().sum()
+
+#finding correlation between every pair of features and the outcome variable, visualising using a heatmap
+corr = diabetesDF.corr()
+print(corr) #outcome of feature and outcome correlations
+sns.heatmap(corr, xticklabels=corr.columns, yticklabels=corr.columns)
+
+#preparing the dataset - splitting the data - to train the model - 650 records, to test the model - 100 records, to cross check - 17 records
+dfTrain = diabetesDF[:650]
+dfTest = diabetesDF[650:750]
+dfCheck = diabetesDF[750:]
+
+#separating the label and features for both training and testing - also converting them to numpy array in order to use it in the ML algorithms
+trainLabel = np.asarray(dfTrain['Outcome'])
+trainData = np.asarray(dfTrain.drop('Outcome',1))
+testLabel = np.asarray(dfTest['Outcome'])
+testData = np.asarray(dfTest.drop('Outcome',1))
+
+#normalizing the input
+means = np.mean(trainData, axis=0)
+stds = np.std(trainData, axis=0)
+trainData = (trainData - means)/stds
+testData = (testData - means)/stds
+
+#Logistic Regression
+diabetesCheck = LogisticRegression()
+diabetesCheck.fit(trainData, trainLabel)
+
+#Testing the accuracy of the model
+accuracy = diabetesCheck.score(testData, testLabel)
+print("accuracy = ", accuracy * 100, "%")
