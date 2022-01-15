@@ -1,0 +1,106 @@
+#Random Forest
+#import Libraries - mostly in one different file
+import pandas as pd
+import numpy as np
+import warnings
+import seaborn as sns
+import matplotlib as plt
+
+warnings.filterwarnings('ignore')
+plt.rcParams['figure.figsize'] = (10, 10)
+plt.style.use('seaborn')
+
+#load dataset
+df_bank = pd.read_csv('https://raw.githubusercontent.com/rafiag/DTI2020/main/data/bank.csv')
+#drop duration column
+df_bank = df_bank.drop('duration',axis=1)
+
+print('Shape of Dataframe:', df_bank.shape)
+df_bank.head()
+
+#to find missing vaues
+df_bank.isnull().sum()
+
+from sklearn.preprocessing import StandardScaler
+#copying the original dataframe
+df_bank_ready = df_bank.copy()
+
+scaler = StandardScaler()
+num_cols =  ['age', 'balance', 'day', 'campaign', 'pdays', 'previous']
+df_bank_ready[num_cols] = scaler.fit_transform(df_bank[num_cols]) # fit_tranform - to build the model or we can use fit and tranform separately too
+df_bank_ready.head()
+
+df_bank_ready.head(100)
+
+#PREPROCESSING USING ONEHOT ENCODING
+from sklearn.preprocessing import OneHotEncoder
+
+encoder = OneHotEncoder(sparse =False)
+cat_cols= ['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'poutcome']
+
+#Encode categorical data
+df_encoded = pd.DataFrame(encoder.fit_transform(df_bank_ready[cat_cols]))
+df_encoded.columns = encoder.get_feature_names(cat_cols)
+
+#replace the categoraical data with encoded data
+df_bank_ready = df_bank_ready.drop(cat_cols, axis =1 )
+df_bank_ready = pd.concat([df_encoded, df_bank_ready], axis =1 )
+
+#encode target value
+df_bank_ready['deposit'] = df_bank_ready['deposit'].apply(lambda x : 1 if x == 'yes' else 0)
+
+print('Shape of dataframe:' , df_bank_ready.shape )
+df_bank_ready.head()
+
+#Training a model
+#select features
+feature = df_bank_ready.drop('deposit', axis =1)
+
+#select target
+target =  df_bank_ready['deposit']
+
+#Set training and testing data
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, Y_train, Y_test = train_test_split(feature, target, 
+                                                    shuffle = True, 
+                                                    test_size=0.2, 
+                                                    random_state=1)
+
+#Show the traininf and testing data
+print('Shape of training feature:' , X_train.shape)
+print('Shape of training feature:' , X_test.shape)
+print('Shape of training label:' , Y_train.shape)
+print('Shape of testing  label:' , Y_test.shape)
+
+#to build a model we can create a function which can be reused
+def evaluate_model(model, X_test, Y_test):
+  from sklearn import metrics
+
+  #Predict test data 
+  y_pred = model.predict(X_test)
+
+  #calculate accuracy, precision, recall, f1-score
+  acc =  metrics.accuracy_score(Y_test, y_pred)
+  prec = metrics.precision_score(Y_test, y_pred)
+  rec = metrics.recall_score(Y_test, y_pred)
+  f1 = metrics.f1_score(Y_test, y_pred)
+
+  #Display confusion matrix
+  cm = metrics.confusion_matrix(Y_test, y_pred)
+
+  return {'acc' : acc, 'prec': prec, 'rec' : rec, 'f1' : f1, 'cm' : cm }
+  
+  from sklearn.ensemble import RandomForestClassifier  
+classifier= RandomForestClassifier(n_estimators= 10, criterion="entropy")  
+classifier.fit(X_train, Y_train)  
+
+# Evaluate the Model and print their values
+dtc_eval = evaluate_model(classifier, X_test, Y_test)
+
+# Print result
+print('Accuracy:', dtc_eval['acc'])
+print('Precision:', dtc_eval['prec'])
+print('Recall:', dtc_eval['rec'])
+print('F1 Score:', dtc_eval['f1'])
+print('Confusion Matrix:\n', dtc_eval['cm'])
