@@ -1,0 +1,20 @@
+# Importing
+import sklearn
+from sklearn.datasets import load_boston
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+diabetesDF = pd.read_csv('https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv',names=['pregnancies','glucose','bloodpressure','skinthickness','insulin','BMI','DiabetesPedigreeFunction','Age','Outcome'  ])
+print(diabetesDF.head())
+
+sns.boxplot(diabetesDF['DiabetesPedigreeFunction'])
+
+#from the above chart we can see the values above say 1.5 are outliers
+import numpy as np
+from scipy import stats
+print(np.where(diabetesDF['DiabetesPedigreeFunction']>1.5))
+
+#dropping rows for the values more than 1.5 in this selected column - using Z score
+diabetesDFnew = diabetesDF[(np.abs(stats.zscore(diabetesDF['DiabetesPedigreeFunction']))>1.5)] 
+
