@@ -1,0 +1,21 @@
+##TIME SERIES##
+import pandas as pd
+import numpy as np
+df = pd.read_csv('times.csv')
+df
+
+#forward fill technique - fills in the value of the index before it, technically forward
+forfill = df.ffill()
+forfill
+
+#backward fill technique - fills in the value of the index after it, technically backward
+backfill = df.bfill()
+backfill
+
+#Interpolate technique - basically uses the two values to get the average and insert it
+interpolate = df.interpolate()
+interpolate
+
+# same technique with a limit parameter - this will 6 consecutive NaNs in the backward direction
+interpolateL = df.interpolate(limit =6, limit_direction="backward")
+interpolateL
