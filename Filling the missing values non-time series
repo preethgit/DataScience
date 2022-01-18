@@ -1,0 +1,35 @@
+## NON-TIME SERIES ##
+#Approach will be to 
+# 1. Import the module
+# 2. Load data set
+# 3. Check the missing values
+# 4. Fill in the missing values
+# 5. Verify the dataset to see if the missing values you checked in step 3 is filled in
+
+# importing pandas module
+import pandas as pd
+
+# loading data set
+data = pd.read_csv('item.csv')
+# display the data
+print(data)
+print(data['quantity'].mean())
+print(data['price'].median())
+print(data['bought'].std())
+
+# replacing missing values in quantity column with mean of that column
+data['quantity'] = data['quantity'].fillna(data['quantity'].mean())
+
+# replacing missing values in price column with median of that column
+data['price'] = data['price'].fillna(data['price'].median())
+
+# replacing missing values in bought column with standard deviation of that column
+data['bought'] = data['bought'].fillna(data['bought'].std())
+
+# replacing missing values in forenoon column with minimum number of that column
+data['forenoon'] = data['forenoon'].fillna(data['forenoon'].min())
+
+# replacing missing values in afternoon column with maximum number of that column
+data['afternoon'] = data['afternoon'].fillna(data['afternoon'].max())
+
+print(data)
