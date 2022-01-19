@@ -1,0 +1,11 @@
+#importing OpenCV(cv2) 
+import cv2
+img = cv2.imread('scene4.jpg')
+print("Image Properties") 
+print("Number of Pixels: " + str(img.size)) 
+print("Shape/Dimensions: " + str(img.shape))  
+
+from PIL import Image
+im = Image.open('scene4.jpg','r')
+pix = list(im.getdata()) # converting the image into pixels
+print(pix)
