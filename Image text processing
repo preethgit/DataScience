@@ -1,0 +1,18 @@
+!pip install pytesseract # required to be installed iif the working is in Colab
+#Text image processing
+from PIL import Image
+from pytesseract import pytesseract
+
+# Defining paths to tesseract.exe
+# and the image we would be using # if installed in your local machine
+path_to_tesseract = r"C:\Program Files\Tesseract-OCR\tesseract.exe" 
+image_path = r"textimg.jpg"
+
+# Opening the image & storing it in an image object
+img = Image.open(image_path)
+
+pytesseract.tesseract_cmd = path_to_tesseract
+
+text = pytesseract.image_to_string(img)
+
+print(text[:-1])
